@@ -1,0 +1,47 @@
+name: "获取验证码"
+method: "POST"
+url: "/captcha/get"
+headers:
+  Content-Type: "application/json"
+  tenant-id: "1"
+  Authorization: "Bearer 46ca69356fdb4a979ccca6362a8e03f4"
+body:
+  json:
+    capchaType: "blockPuzzle"
+verify_ssl: false
+assert:
+  - target: "$.success"
+    expected: true
+    type: "equal"
+
+  - target: "$.repData.secretKey"
+    expected: null
+    type: "is_not_none"
+
+  - target: "$.repData.token"
+    expected: null
+    type: "is_not_none"
+
+  - target: "$.repData.originalImageBase64"
+    expected: null
+    type: "is_not_none"
+
+  - target: "$.repData.secretKey"
+    expected: "str"
+    type: "type_equal"  # 新增类型校验逻辑（见下方说明）
+
+  - target: "$.repData.token"
+    expected: "str"
+    type: "type_equal"
+
+  - target: "$.repData.result"
+    expected: false
+    type: "equal"
+
+  - target: "$.repData.token"
+    expected: 0
+    type: "greater_than"  # 校验长度>0（需配合长度提取逻辑）
+
+  - target: "$.repData.originalImageBase64"
+    expected: "iVBORw0KGgo"
+    type: "starts_with"
