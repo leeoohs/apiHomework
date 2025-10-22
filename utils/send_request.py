@@ -1,7 +1,28 @@
+from string import Template
+
 import requests
 from jsonpath import jsonpath
 
 from config.setting import BASE_URL
+
+
+class MyTemplate(Template):
+    delimiter = "!"
+
+
+def substitute_vars(value, vars):
+    """
+    递归替换字符串中的变量
+    :param value: 字符串或字典
+    :param vars: 变量字典
+    :return: 替换后的字符串或字典
+    """
+    if isinstance(value, str):
+        return MyTemplate(value).substitute(vars)
+    elif isinstance(value, dict):
+        return {k: substitute_vars(v, vars) for k, v in value.items()}
+    elif isinstance(value, list):
+        return [substitute_vars(v, vars) for v in value]
 
 
 def send_request(case_data):
@@ -14,8 +35,15 @@ def send_request(case_data):
     :param kwargs: 其他参数
     :return: 响应对象
     """
+    full_vars = {**case_data.get("context", {}), **case_data}
+
+    url = substitute_vars(case_data["url"], full_vars)
+    if url.startswith("/"):
+        from config.setting import BASE_URL
+        url = BASE_URL + url
+
     # 拼接完整请求地址
-    url = BASE_URL + case_data['url'] if case_data['url'].startswith('/') else case_data['url']
+    # url = BASE_URL + case_data['url'] if case_data['url'].startswith('/') else case_data['url']
 
     # 请求方法
     method = case_data.get("method", "").upper()
@@ -51,7 +79,7 @@ def send_request(case_data):
             request_kwargs["data"] = form_data
 
     response = requests.request(**request_kwargs)
-    print("接口响应：", response.text)
+    print("接口响应：", response.json())
 
     # 断言
     assertions = case_data.get("assert", [])
@@ -76,7 +104,6 @@ def send_request(case_data):
         assert_type = assert_item["type"].lower()
 
         # 提取实际值
-        # 替换原提取实际值的代码段
         try:
             if target == "status_code":
                 actual = response.status_code
@@ -87,7 +114,6 @@ def send_request(case_data):
                 if matches is None:
                     raise ValueError(f"JSONPath '{target}' 未匹配到结果")
 
-                # 关键修复：兼容非列表类型的结果（如bool、None等）
                 if isinstance(matches, list):
                     actual = matches[0] if len(matches) == 1 else matches
                 else:

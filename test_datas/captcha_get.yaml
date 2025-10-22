@@ -3,11 +3,11 @@ method: "POST"
 url: "/captcha/get"
 headers:
   Content-Type: "application/json"
-  tenant-id: "1"
+  tenant-id: "!tenant_id"
   Authorization: "Bearer 46ca69356fdb4a979ccca6362a8e03f4"
 body:
   json:
-    capchaType: "blockPuzzle"
+    capchaType: "!capcha_type"
 verify_ssl: false
 assert:
   - target: "$.success"
@@ -45,3 +45,8 @@ assert:
   - target: "$.repData.originalImageBase64"
     expected: "iVBORw0KGgo"
     type: "starts_with"
+
+ddts:
+  - tenant_id: "1"
+    capcha_type: "blockPuzzle"
+    desc: "租户1 - 滑块验证码"
