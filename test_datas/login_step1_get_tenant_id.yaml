@@ -1,0 +1,29 @@
+name: "子用户登录用例1：获取租户ID"
+method: "GET"
+url: "/admin-api/system/tenant/get-id-by-name?name=!tenant_name"  # 引用ddts的tenant_name
+headers:
+  Content-Type: "application/json"
+  tenant-id: "!tenant_id"
+extract:
+  - target: "$.data"
+    varname: "real_tenant_id"
+assert:
+  - target: "status_code"
+    expected: 200
+    type: "equal"
+    errorMsg: "获取租户ID接口状态码异常"
+
+  - target: "$.code"
+    expected: 0
+    type: "equal"
+    errorMsg: "获取租户ID接口调用失败"
+
+  - target: "$.data"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "获取租户ID接口未返回data字段"
+
+  - target: "$.data"
+    expected: 1
+    type: "equal"
+    errorMsg: "获取的租户ID与预期不符"

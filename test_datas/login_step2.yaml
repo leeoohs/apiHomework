@@ -1,0 +1,39 @@
+name: "用户登录子用例2：用户登录"
+method: "POST"
+url: "/admin-api/system/auth/login"
+headers:
+  Content-Type: "application/json"
+  tenant-id: "!real_tenant_id"
+body:
+  json:
+    tenantName: "!tenant_name"
+    username: "!login_username"
+    password: "!login_password"
+    rememberMe: true
+extract:
+  - target: "$.data.accessToken"
+    varname: "bearer_token"
+  - target: "$.data.userId"
+    varname: "user_id"
+  - target: "$.data.expiresTime"
+    varname: "token_expire_time"
+assert:
+  - target: "status_code"
+    expected: 200
+    type: "equal"
+    errorMsg: "登录接口状态码异常（非200）"
+
+  - target: "$.code"
+    expected: 0
+    type: "equal"
+    errorMsg: "登录失败（code≠0，错误信息：$.msg）"
+
+  - target: "$.data.accessToken"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "登录未返回accessToken"
+
+  - target: "$.data.userId"
+    expected: "!userId"
+    type: "equal"
+    errorMsg: "返回的userId与预期不符（实际：$.data.userId）"

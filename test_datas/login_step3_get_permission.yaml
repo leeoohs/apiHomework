@@ -1,0 +1,65 @@
+name: "用户登录子用例3：获取权限信息"
+method: "GET"
+url: "/admin-api/system/auth/get-permission-info"
+headers:
+  Content-Type: "application/json"
+  tenant-id: "!real_tenant_id"
+assert:
+  - target: "status_code"
+    expected: 200
+    type: "equal"
+    errorMsg: "获取权限接口状态码异常，预期200，实际为${status_code}"
+
+  - target: "$.code"
+    expected: 0
+    type: "equal"
+    errorMsg: "获取权限业务状态码异常，预期0（成功），实际为${$.code}"
+
+  - target: "$.data"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "权限接口未返回核心数据（data字段为空）"
+
+  - target: "$.data.permissions"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "权限数据缺少permissions字段（用户权限列表）"
+
+  - target: "$.data.permissions"
+    expected: []
+    type: "is_not_empty"
+    errorMsg: "permissions字段为空，用户无任何权限"
+
+  - target: "$.data.permissions[0]"
+    expected: ""
+    type: "equal"
+    errorMsg: "permissions首项不符合实际返回，预期为空字符串，实际为${$.data.permissions[0]}"
+
+  # 7. 补充断言：用户信息user字段必返（确保身份关联正确）
+  - target: "$.data.user"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "权限数据缺少user字段（用户基本信息）"
+
+  - target: "$.data.user.id"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "user字段缺少id（用户唯一标识）"
+
+  - target: "$.data.roles"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "权限数据缺少roles字段（用户角色列表）"
+  - target: "$.data.roles"
+    expected: []
+    type: "is_not_empty"
+    errorMsg: "roles字段为空，用户无任何角色"
+
+  - target: "$.data.menus"
+    expected: null
+    type: "is_not_none"
+    errorMsg: "权限数据缺少menus字段（系统菜单列表）"
+  - target: "$.data.menus"
+    expected: []
+    type: "is_not_empty"
+    errorMsg: "menus字段为空，用户无任何菜单权限"

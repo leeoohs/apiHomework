@@ -140,7 +140,6 @@ def send_request(case_data):
                 assert isinstance(actual, (int, float)) and isinstance(expected, (int, float)), \
                     "greater_than仅支持数字类型"
                 assert actual > expected, f"{actual}不应≤{expected}"
-            # 在原有的assert_type判断中增加以下分支
             elif assert_type == "type_equal":
                 # 校验字段类型（expected为"str"/"int"/"bool"等）
                 type_map = {
@@ -154,7 +153,6 @@ def send_request(case_data):
                     raise ValueError(f"不支持的类型校验：{expected}，支持类型：{list(type_map.keys())}")
                 assert isinstance(actual, type_map[expected]), \
                     f"字段类型不匹配，预期{expected}，实际{type(actual).__name__}"
-
             elif assert_type == "starts_with":
                 # 校验字符串前缀
                 assert isinstance(actual, str), "starts_with仅支持字符串类型"

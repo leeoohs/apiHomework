@@ -1,0 +1,12 @@
+name: "主用例：用户登录"
+verify_ssl: false
+context:
+  tenant_name: "温大大"
+  login_username: "admin"
+  login_password: "admin123"
+  tenant_id: "1"
+  userId: "1"
+steps:
+  - !include ./login_step1_get_tenant_id.yaml
+  - !include ./login_step2.yaml
+  - !include ./login_step3_get_permission.yaml
